@@ -33,6 +33,14 @@ void inicializarTabla(struct TablaPaginas *tabla) {
 }
 
 bool cargarPagina(struct TablaPaginas *tabla, int pagina, int marco, char proceso) {
+    // Verificar si el marco ya está ocupado por otro proceso
+    for (int i = 0; i < NUM_PAGES; i++) {
+        if (tabla->paginas[i].marco_memoria == marco && tabla->paginas[i].proceso != proceso) {
+            printf("Error: El marco %d ya está ocupado por el proceso %c\n", marco, tabla->paginas[i].proceso);
+            return false;
+        }
+    }
+
     if (tabla->paginas[pagina].en_memoria) {
         return false; // La página ya está cargada
     }
