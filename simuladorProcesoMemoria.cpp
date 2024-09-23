@@ -93,12 +93,29 @@ void manejarColaEspera(struct TablaPaginas *tabla) {
         char proceso = cola_espera.front();
         cola_espera.pop();
         printf("Proceso %c sacado de la cola de espera\n", proceso);
+
         // Intentar cargar el proceso en memoria
+        bool cargado = false;
         for (int i = 0; i < NUM_PAGES; i++) {
             if (!tabla->paginas[i].en_memoria) {
-                cargarPagina(tabla, i, i, proceso);
-                break;
+                // Verificar si hay un proceso igual en el mismo marco
+                bool marco_ocupado = false;
+                for (int j = 0; j < NUM_PAGES; j++) {
+                    if (tabla->paginas[j].marco_memoria == i && tabla->paginas[j].proceso == proceso) {
+                        marco_ocupado = true;
+                        break;
+                    }
+                }
+                if (!marco_ocupado) {
+                    if (cargarPagina(tabla, i, i, proceso)) {
+                        cargado = true;
+                        break;
+                    }
+                }
             }
+        }
+        if (!cargado) {
+            printf("No se pudo cargar el proceso %c en memoria\n", proceso);
         }
     }
 }
